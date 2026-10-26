@@ -151,12 +151,12 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
 </head>
 <body data-theme="dark">
 <div class="splash" id="splash">
-  <video id="splashVid" src="assets/splash_lite.mp4" autoplay muted playsinline preload="auto"></video>
+  <video id="splashVid" src="assets/splash.mp4" autoplay muted playsinline preload="auto"></video>
   <img class="fallback" src="assets/landscape-logo.png" alt="Hyde Park Corner">
   <div class="skip">TAP TO SKIP</div>
 </div>
 <script>
-/* splash: plays assets/splash_lite.mp4 at 1.5x once, then fades out */
+/* splash: plays assets/splash.mp4 at 1.5x once, then fades out */
 (function(){
   var s=document.getElementById('splash'),v=document.getElementById('splashVid'),gone=false,t;
   function end(){if(gone)return;gone=true;clearTimeout(t);s.classList.add('off');try{v.pause()}catch(e){}setTimeout(function(){s.remove()},650)}
