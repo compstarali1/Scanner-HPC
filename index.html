@@ -136,7 +136,7 @@ video{width:100%;height:100%;object-fit:cover;display:block}
 /* ---------- branding: backgrounds, hills, logos, splash ---------- */
 :root{--bgimg:url('assets/background-dark.jpg');--scrim:rgba(6,9,18,.66)}
 [data-theme="light"]{--bgimg:url('assets/background_light.png');--scrim:rgba(233,238,248,.6)}
-body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(var(--scrim),var(--scrim)),var(--bgimg) center top/cover no-repeat}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;background:linear-gradient(var(--scrim),var(--scrim)),var(--bgimg) center top/cover no-repeat}
 .hills{position:fixed;left:0;right:0;bottom:0;width:100%;height:auto;z-index:1;opacity:.6;pointer-events:none;-webkit-mask-image:linear-gradient(transparent,#000 45%);mask-image:linear-gradient(transparent,#000 45%)}
 .logo{height:38px;width:auto;display:block;filter:drop-shadow(0 3px 8px rgba(0,0,0,.45))}
 .brand{display:flex;justify-content:center;margin:26px 0 8px}
@@ -151,19 +151,21 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 </head>
 <body data-theme="dark">
 <div class="splash" id="splash">
-  <video id="splashVid" src="assets/splash.mp4" autoplay muted playsinline preload="auto"></video>
-  <img class="fallback" src="assets/landscape-logo.gif" alt="Hyde Park Corner">
+  <video id="splashVid" src="assets/splash_lite.mp4" autoplay muted playsinline preload="auto"></video>
+  <img class="fallback" src="assets/landscape-logo.png" alt="Hyde Park Corner">
   <div class="skip">TAP TO SKIP</div>
 </div>
 <script>
-/* splash: plays assets/splash.mp4 once, then fades out */
+/* splash: plays assets/splash_lite.mp4 at 1.5x once, then fades out */
 (function(){
   var s=document.getElementById('splash'),v=document.getElementById('splashVid'),gone=false,t;
   function end(){if(gone)return;gone=true;clearTimeout(t);s.classList.add('off');try{v.pause()}catch(e){}setTimeout(function(){s.remove()},650)}
   function fail(){s.classList.add('nov');clearTimeout(t);t=setTimeout(end,1800)}
+  v.playbackRate=1.5;
   v.addEventListener('ended',end);
   v.addEventListener('error',fail);
-  v.addEventListener('loadedmetadata',function(){clearTimeout(t);t=setTimeout(end,Math.min(12000,(v.duration||5)*1000+1500))});
+  v.addEventListener('loadedmetadata',function(){v.playbackRate=1.5;clearTimeout(t);t=setTimeout(end,Math.min(12000,(v.duration||5)*1000/1.5+1500))});
+  v.addEventListener('play',function(){v.playbackRate=1.5});
   s.addEventListener('click',end);
   t=setTimeout(end,9000);
   var p=v.play&&v.play();if(p&&p.catch)p.catch(fail);
@@ -197,7 +199,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
   <div class="two"><div id="col1" class="col"></div><div id="col2" class="col"></div></div>
   <div id="pendEmpty" class="empty hidden">Nothing pending. Paste registrations and tap ADD.</div></div>
 <div class="section"><h2 class="st">✅ Completed</h2><div id="completedList" class="single"></div></div>
-<div class="brand"><img src="assets/landscape-logo.gif" alt="Hyde Park Corner"></div>
+<div class="brand"><img src="assets/landscape-logo.png" alt="Hyde Park Corner"></div>
 </div>
 
 <!-- Floating scanner -->
@@ -215,7 +217,6 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
     <button class="key k-cyan" data-exp="ALL"><i>📄</i>ALL JOBS</button>
     <button class="key k-green" data-exp="COMPLETED"><i>✅</i>COMPLETED</button>
     <button class="key k-amber" data-exp="REMAINING"><i>⏳</i>REMAINING</button>
-    <button class="key k-blue" data-exp="REGS"><i>🔢</i>REG NUMBERS</button>
     <div class="sep">Backup</div>
     <button class="key k-cyan" id="saveBtn"><i>💾</i>SAVE</button>
     <button class="key k-blue" id="restoreBtn"><i>⬆</i>RESTORE</button>
@@ -335,12 +336,14 @@ $('selAll').onclick=()=>{const all=pending.every(r=>checkedItems[r]);pending.for
 
 /* ---------- tools sheet ---------- */
 const stamp=()=>{const d=new Date();return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`};
+const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],MONS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const dateTag=()=>{const d=new Date(),p=n=>String(n).padStart(2,'0');return `${DAYS[d.getDay()]}-${p(d.getDate())}_${MONS[d.getMonth()]}-${String(d.getFullYear()).slice(-2)}`};
 function download(n,c,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=n;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 $('moreBtn').onclick=()=>$('moreModal').classList.add('show');
 $('moreModal').addEventListener('click',e=>{if(e.target.id==='moreModal')e.target.classList.remove('show')});
 document.querySelectorAll('[data-exp]').forEach(b=>b.onclick=()=>{
   const t=b.dataset.exp,data=t==='COMPLETED'?completed:t==='REMAINING'?[...found,...pending]:[...found,...pending,...completed];
-  download(`HPC-${t}-${stamp()}.txt`,data.join('\n'),'text/plain');$('moreModal').classList.remove('show');toast(`⬇ Exported ${data.length}`)});
+  download(`${dateTag()}-${data.length}_Regs.txt`,data.join('\n'),'text/plain');$('moreModal').classList.remove('show');toast(`⬇ Exported ${data.length}`)});
 $('saveBtn').onclick=()=>{download(`HPC-SAVE-${stamp()}.json`,JSON.stringify({found,pending,completed,notes,checkedItems},null,2),'application/json');toast('💾 Saved to file')};
 $('restoreBtn').onclick=()=>{const i=document.createElement('input');i.type='file';i.accept='.json';
   i.onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();
@@ -426,16 +429,31 @@ async function onMatch(reg){
   const r=s.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,22);navigator.vibrate&&navigator.vibrate(70);sound('ok','ok');
   toast(`✅ ${reg} found`);render();
   await new Promise(r=>setTimeout(r,1100));s.classList.remove('hit');setStt('Aim at next plate…')}
+async function startStream(){
+  const tries=[
+    {video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false},
+    {video:{facingMode:'environment'},audio:false},
+    {video:true,audio:false}
+  ];
+  let err=null;
+  for(const c of tries){
+    try{return await navigator.mediaDevices.getUserMedia(c)}
+    catch(e){err=e;if(e.name==='NotAllowedError'||e.name==='SecurityError')break}
+  }
+  throw err;
+}
 async function openScan(){
   audio();
   const my=++session;active=true;$('lb').classList.add('show');$('fab').classList.add('open');$('fabIcon').textContent='✕';setStt('Starting camera…');
-  if(!navigator.mediaDevices?.getUserMedia){toast('⚠️ Camera needs HTTPS or a local file');return closeScan()}
+  if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){toast('⚠️ Camera needs a secure (HTTPS) page');return closeScan()}
   try{
-    const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false});
+    const s=await startStream();
     if(my!==session){s.getTracks().forEach(t=>t.stop());return}
-    stream=s;const v=$('video');v.srcObject=s;await v.play().catch(()=>{});
+    stream=s;const v=$('video');v.srcObject=s;v.muted=true;await v.play().catch(()=>{});
     setStt('Loading reader…');getWorker().then(()=>{if(my===session){setStt('Aim at a plate…');loop(my)}}).catch(e=>{toast('⚠️ '+e.message);closeScan()})
-  }catch(e){toast('⚠️ Camera unavailable — allow permission');closeScan()}}
+  }catch(e){
+    const why={NotAllowedError:'permission denied',SecurityError:'blocked by browser',NotFoundError:'no camera found',NotReadableError:'camera in use by another app',OverconstrainedError:'camera settings not supported'}[e.name]||e.name||'unknown error';
+    toast(`⚠️ Camera: ${why}`);closeScan()}}
 function closeScan(){
   active=false;session++;$('lb').classList.remove('show');$('fab').classList.remove('open');$('fabIcon').textContent='📷';
   $('strip').classList.remove('hit');$('torch').classList.remove('on');hits={};
