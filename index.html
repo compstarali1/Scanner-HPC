@@ -26,10 +26,12 @@ h1{font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:8px}
 
 .lbl{font-size:.72rem;color:var(--muted);margin-bottom:5px;display:block}
 .iw{position:relative;margin-bottom:14px}
-.ta{width:100%;padding:11px 38px 11px 13px;border-radius:var(--r);background:var(--glass);border:1px solid var(--gb);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--text);font-size:.9rem;line-height:1.45;min-height:64px;overflow:hidden;resize:none;box-shadow:inset 0 2px 8px rgba(0,0,0,.25);transition:border-color .25s,box-shadow .25s}
+.ta{width:100%;padding:11px 78px 11px 13px;border-radius:var(--r);background:var(--glass);border:1px solid var(--gb);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--text);font-size:.9rem;line-height:1.45;min-height:64px;overflow:hidden;resize:none;box-shadow:inset 0 2px 8px rgba(0,0,0,.25);transition:border-color .25s,box-shadow .25s}
 .ta:focus{outline:none;border-color:var(--cyan);box-shadow:inset 0 2px 8px rgba(0,0,0,.25),0 0 0 3px rgba(52,231,228,.15),0 0 26px rgba(52,231,228,.15)}
-.clr{position:absolute;top:8px;right:8px;background:transparent;border:0;color:var(--muted);font-size:17px;cursor:pointer;width:26px;height:26px;border-radius:50%;transition:.25s}
-.clr:hover{background:rgba(239,68,68,.15);color:var(--red);transform:rotate(90deg)}
+/* paste button sits where the old × clear button was */
+.paste-btn{position:absolute;top:8px;right:8px;border:0;color:var(--cyan);background:rgba(52,231,228,.12);font-size:.72rem;font-weight:700;cursor:pointer;padding:5px 9px;border-radius:8px;transition:background .2s,transform .1s}
+.paste-btn:hover{background:rgba(52,231,228,.22)}
+.paste-btn:active{transform:scale(.92)}
 
 /* 3D frosted keys */
 .keys{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
@@ -59,14 +61,22 @@ h1{font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:8px}
 .mini{margin-left:auto;font-size:.68rem;font-weight:700;color:var(--cyan);background:var(--glass);border:1px solid var(--gb);border-radius:8px;padding:4px 10px;cursor:pointer;transition:.2s var(--spring)}
 .mini:active{transform:scale(.9)}
 .empty{font-size:.8rem;color:var(--muted);padding:10px;border:1px dashed var(--gb);border-radius:var(--r);text-align:center}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
 .col,.single{display:flex;flex-direction:column;gap:6px}
+
+/* Pending (left) | faint centre divider | Completed (right) */
+.lists{display:grid;grid-template-columns:1fr 1px 1fr;gap:0 12px;align-items:stretch}
+.divider{background:linear-gradient(180deg,transparent,var(--gb) 15%,var(--gb) 85%,transparent)}
+.lists .col{min-width:0}
+
 
 .reg-card{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;background:var(--card);border:1px solid var(--gb);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);position:relative;overflow:hidden;box-shadow:0 3px 0 rgba(0,0,0,.18),0 6px 12px rgba(0,0,0,.15);transition:transform .2s,border-color .2s,box-shadow .2s}
 .reg-card:hover{transform:translateX(3px)}
 .reg-card.found{background:rgba(52,231,228,.07);border-color:rgba(52,231,228,.25)}
 .reg-card.completed{background:rgba(45,212,167,.07);border-color:rgba(45,212,167,.2)}
 .reg-card.checked{border-color:var(--green);box-shadow:0 0 0 1px rgba(45,212,167,.35),0 3px 0 rgba(0,0,0,.18),0 6px 18px rgba(45,212,167,.18)}
+/* compact cards for Pending / Completed: 38% of screen width, never narrower than the reg number */
+.lists .reg-card{width:38vw;min-width:max-content;max-width:100%;padding:6px 8px;gap:6px;flex-wrap:nowrap;white-space:nowrap}
+.lists .ra{flex-shrink:0;flex-wrap:nowrap}
 .reg-card.pop{animation:pop .55s var(--spring)}
 .reg-card.pop::before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.3),transparent 70%);transform:translateX(-100%);animation:sheen .9s .1s ease-out}
 .reg-card.out{animation:out .25s ease-in forwards}
@@ -74,16 +84,20 @@ h1{font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:8px}
 @keyframes sheen{to{transform:translateX(100%)}}
 @keyframes out{to{opacity:0;transform:translateX(30px) scale(.9)}}
 .chk{appearance:none;-webkit-appearance:none;width:20px;height:20px;border-radius:6px;border:2px solid var(--muted);flex-shrink:0;cursor:pointer;display:grid;place-items:center;transition:.25s var(--spring)}
+.lists .chk{width:16px;height:16px}
 .chk::after{content:"";width:5px;height:10px;border:solid #06251d;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) scale(0);margin-top:-2px;transition:transform .25s var(--spring)}
 .chk:checked{background:var(--green);border-color:var(--green);transform:scale(1.1)}
 .chk:checked::after{transform:rotate(45deg) scale(1)}
 .chk:disabled{cursor:default;opacity:.8}
-.reg-text{font-size:.95rem;font-weight:700;letter-spacing:.8px}
+.reg-text{font-size:.95rem;font-weight:700;letter-spacing:.8px;white-space:nowrap}
+.lists .reg-text{font-size:.8rem;letter-spacing:.5px}
 .ra{margin-left:auto;display:flex;align-items:center;gap:4px}
 .ab{border:0;font-size:.7rem;font-weight:700;cursor:pointer;padding:5px 9px;border-radius:8px;transition:.2s;animation:pop .35s var(--spring)}
+.lists .ab{padding:2px 5px;font-size:.58rem;letter-spacing:.3px;white-space:nowrap}
 .cb{color:var(--green);background:rgba(45,212,167,.14)}.rb{color:var(--cyan);background:rgba(52,231,228,.1)}
 .ab:active{transform:scale(.92)}
 .x{background:transparent;border:0;color:var(--muted);font-size:16px;cursor:pointer;width:24px;height:24px;border-radius:50%;transition:.25s}
+.lists .x{width:20px;height:20px;font-size:14px}
 .x:hover{background:rgba(239,68,68,.15);color:var(--red);transform:rotate(90deg)}
 
 .toasts{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:2000;display:flex;flex-direction:column;gap:8px;width:min(92vw,380px);pointer-events:none}
@@ -130,7 +144,6 @@ video{width:100%;height:100%;object-fit:cover;display:block}
 @keyframes fly{to{transform:translate(var(--dx),var(--dy)) rotate(var(--rot));opacity:0}}
 .hidden{display:none!important}
 :focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
-@media(max-width:700px){.two{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
 /* ---------- branding: backgrounds, hills, logos, splash ---------- */
@@ -178,7 +191,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
 <header><h1><img class="logo" src="assets/hpc-logo.png" alt="HPC"> HPC Job Scanner</h1><div class="theme" id="theme" role="button" aria-label="Toggle theme">🌙</div></header>
 
 <label class="lbl" for="ta">Paste registrations, one per line. Add " - DONE" to mark completed.</label>
-<div class="iw"><textarea id="ta" class="ta" placeholder="BP24FCN&#10;PJ22VHO&#10;BL24RM - DONE"></textarea><button class="clr" id="clr" aria-label="Clear">×</button></div>
+<div class="iw"><textarea id="ta" class="ta" placeholder="BP24FCN&#10;PJ22VHO&#10;BL24RM - DONE"></textarea><button class="paste-btn" id="pasteBtn" aria-label="Paste from clipboard">📋 PASTE</button></div>
 
 <div class="keys">
   <button class="key k-cyan" id="addBtn"><i>➕</i>ADD</button>
@@ -195,13 +208,23 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
 </div>
 
 <div class="section"><h2 class="st">💠 Found</h2><div id="foundList" class="single"></div><div id="foundEmpty" class="empty">Tap the camera button and aim at a plate.</div></div>
-<div class="section"><h2 class="st">⏳ Pending <button class="mini" id="selAll">SELECT ALL</button></h2>
-  <div class="two"><div id="col1" class="col"></div><div id="col2" class="col"></div></div>
-  <div id="pendEmpty" class="empty hidden">Nothing pending. Paste registrations and tap ADD.</div></div>
-<div class="section"><h2 class="st">✅ Completed</h2><div id="completedList" class="single"></div></div>
+
+<div class="section lists">
+  <div class="col-pending">
+    <h2 class="st">⏳ Pending <button class="mini" id="selAll">SELECT ALL</button></h2>
+    <div id="col1" class="col"></div>
+    <div id="pendEmpty" class="empty hidden">Nothing pending. Paste registrations and tap ADD.</div>
+  </div>
+  <div class="divider"></div>
+  <div class="col-completed">
+    <h2 class="st">✅ Completed</h2>
+    <div id="completedList" class="col"></div>
+  </div>
+</div>
+
 <div class="brand"><img id="brandLogo" src="assets/landscape-logo.gif" alt="Hyde Park Corner"></div>
 <script>
-/* bottom logo: animated GIF runs for 10 seconds, then switches to the static PNG to reduce processor load */
+/* bottom logo: animated GIF runs for 8 seconds, then switches to the static PNG to reduce processor load */
 (function(){
   var img=document.getElementById('brandLogo');
   setTimeout(function(){img.src='assets/landscape-logo.png'},8000);
@@ -285,18 +308,18 @@ function card(reg,type){
   d.className=`reg-card ${type==='found'?'found':''} ${type==='completed'?'completed':''} ${type==='pending'&&on?'checked':''} ${fresh.has(reg)?'pop':''}`;
   d.dataset.reg=reg;d.dataset.type=type;
   const del='<button class="x" data-act="del" aria-label="Remove">×</button>';
-  d.innerHTML=type==='pending'
-   ?`<input type="checkbox" class="chk" data-act="check" ${on?'checked':''} aria-label="Select ${reg}"><span class="reg-text">${reg}</span><div class="ra">${on?'<button class="ab cb" data-act="complete">✓ COMPLETE</button>':''}${del}</div>`
-   :type==='found'
-   ?`<input type="checkbox" class="chk" checked disabled><span class="reg-text">${reg}</span><div class="ra"><button class="ab cb" data-act="complete">✓ COMPLETE</button>${del}</div>`
-   :`<input type="checkbox" class="chk" checked disabled><span class="reg-text">${reg}</span><div class="ra"><button class="ab rb" data-act="restore">↩ RESTORE</button>${del}</div>`;
+  if(type==='pending'){
+    d.innerHTML=`<input type="checkbox" class="chk" data-act="check" ${on?'checked':''} aria-label="Select ${reg}"><span class="reg-text">${reg}</span><div class="ra">${on?'<button class="ab cb" data-act="complete">✓ COMPLETE</button>':''}${del}</div>`;
+  }else if(type==='found'){
+    d.innerHTML=`<input type="checkbox" class="chk" checked disabled><span class="reg-text">${reg}</span><div class="ra"><button class="ab cb" data-act="complete">✓ COMPLETE</button>${del}</div>`;
+  }else{
+    d.innerHTML=`<input type="checkbox" class="chk" checked disabled><span class="reg-text">${reg}</span><div class="ra"><button class="ab rb" data-act="restore" aria-label="Restore">↩ RESTORE</button>${del}</div>`;
+  }
   return d}
 function render(){
-  ['foundList','col1','col2','completedList'].forEach(i=>$(i).innerHTML='');
+  ['foundList','col1','completedList'].forEach(i=>$(i).innerHTML='');
   found.forEach(r=>$('foundList').appendChild(card(r,'found')));
-  const mid=Math.ceil(pending.length/2);
-  pending.slice(0,mid).forEach(r=>$('col1').appendChild(card(r,'pending')));
-  pending.slice(mid).forEach(r=>$('col2').appendChild(card(r,'pending')));
+  pending.forEach(r=>$('col1').appendChild(card(r,'pending')));
   completed.forEach(r=>$('completedList').appendChild(card(r,'completed')));
   $('foundEmpty').classList.toggle('hidden',found.length>0);
   $('pendEmpty').classList.toggle('hidden',pending.length>0);
@@ -330,7 +353,17 @@ function parse(){
   if(!parts.length)shake(ta);else{ta.value='';ta.style.height='auto';burstAt($('addBtn'))}
   toast(parts.join(' | ')||'⚠️ No valid registrations found');render()}
 $('addBtn').onclick=parse;
-$('clr').onclick=()=>{ta.value='';ta.style.height='auto'};
+
+/* paste button: reads the clipboard into the registration box */
+$('pasteBtn').onclick=async()=>{
+  try{
+    const txt=await navigator.clipboard.readText();
+    if(!txt.trim())return toast('⚠️ Clipboard is empty');
+    ta.value=txt;ta.dispatchEvent(new Event('input'));
+    toast('📋 Pasted from clipboard');
+  }catch{toast('⚠️ Clipboard blocked — long-press the box and paste')}
+};
+
 $('doneBtn').onclick=async()=>{
   const sel=[...pending,...found].filter(r=>checkedItems[r]);
   if(!sel.length){shake($('doneBtn'));return toast('⚠️ Tick pending items first')}
