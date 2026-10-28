@@ -125,7 +125,7 @@ h1{font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:8px}
 @keyframes fab{0%{filter:drop-shadow(0 0 0 rgba(45,212,167,.6))}100%{filter:drop-shadow(0 0 18px rgba(45,212,167,0))}}
 .lb{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:calc(max(18px,env(safe-area-inset-bottom)) + 82px);width:min(92vw,340px);padding:8px;border-radius:18px;z-index:899;background:var(--glass);border:1px solid var(--gb);backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);box-shadow:0 20px 44px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.25);transform-origin:bottom right;transform:scale(.2) translateY(30px);opacity:0;pointer-events:none;transition:transform .45s var(--spring),opacity .25s}
 .lb.show{transform:none;opacity:1;pointer-events:auto}
-.strip{position:relative;height:84px;border-radius:12px;overflow:hidden;background:#000;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+.strip{position:relative;height:84px;border-radius:12px;overflow:hidden;background:#000;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15);cursor:pointer}
 video{width:100%;height:100%;object-fit:cover;display:block}
 .guide{position:absolute;inset:14px 12px;border:2px solid var(--cyan);border-radius:8px;box-shadow:0 0 0 999px rgba(0,0,0,.35);animation:gp 1.8s ease-in-out infinite}
 @keyframes gp{50%{border-color:rgba(52,231,228,.45)}}
@@ -160,6 +160,18 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
 .splash .fallback{position:absolute;width:min(70vw,320px);height:auto;display:none}
 .splash.nov .fallback{display:block}
 .splash .skip{position:absolute;right:max(16px,env(safe-area-inset-right));bottom:max(22px,env(safe-area-inset-bottom));font-size:.72rem;font-weight:600;letter-spacing:.5px;color:#fff;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:20px;padding:7px 14px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+
+/* ---------- scan result popup ---------- */
+.scan-pop{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%) scale(.6);z-index:4000;padding:14px 26px;border-radius:16px;font-size:1.1rem;font-weight:800;letter-spacing:.8px;color:#0a0e1a;text-align:center;pointer-events:none;opacity:0;box-shadow:0 12px 30px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.5);animation:scanPop var(--dur) var(--spring) forwards}
+.scan-pop.dup{background:#ffd23f;border:1px solid #e0b000}
+.scan-pop.match{background:#2dd4a7;border:1px solid #1fa882}
+@keyframes scanPop{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}
+  18%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}
+  30%{transform:translate(-50%,-50%) scale(1)}
+  75%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(.9)}
+}
 </style>
 </head>
 <body data-theme="dark">
@@ -269,6 +281,16 @@ const save=()=>{try{localStorage.setItem('hpcData',JSON.stringify({found,pending
 /* ---------- helpers ---------- */
 ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px'});
 function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;$('toasts').appendChild(t);setTimeout(()=>{t.classList.add('bye');setTimeout(()=>t.remove(),300)},2900)}
+/* centre-screen scan popup: type 'dup' (yellow) or 'match' (green), shown for ms milliseconds */
+function scanPopup(type,text,ms){
+  document.querySelectorAll('.scan-pop').forEach(p=>p.remove());
+  const p=document.createElement('div');
+  p.className=`scan-pop ${type}`;
+  p.textContent=text;
+  p.style.setProperty('--dur',ms+'ms');
+  document.body.appendChild(p);
+  setTimeout(()=>p.remove(),ms+50);
+}
 function shake(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake')}
 function burst(x,y,n=16){
   if(reduce)return;const cols=['#34e7e4','#2dd4a7','#ffb347','#5b8cff','#b983ff'];
@@ -457,7 +479,7 @@ async function loop(my){
             else{
               hits={};
               const o=find([...found,...completed],t,0);
-              if(o){setStt(`${o.r} already scanned`);sound('dup',o.r)}
+              if(o){setStt(`${o.r} already scanned`);sound('dup',o.r);scanPopup('dup','Duplicate',700)}
               else{setStt(`Not on list: ${text.trim().slice(0,14)}`);sound('bad','bad')}
             }}}
       }catch(e){console.warn('OCR error',e);setStt('Reader error — retrying');await new Promise(r=>setTimeout(r,1500))}
@@ -466,12 +488,16 @@ async function loop(my){
 async function onMatch(reg){
   pending=pending.filter(r=>r!==reg);delete checkedItems[reg];if(!found.includes(reg))found.push(reg);fresh.add(reg);
   const s=$('strip');s.dataset.hit=reg;s.classList.add('hit');setStt(`${reg} matched ✓`);
+  scanPopup('match','Match Found',500);
   const r=s.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,22);navigator.vibrate&&navigator.vibrate(70);sound('ok','ok');
   toast(`✅ ${reg} found`);render();
   await new Promise(r=>setTimeout(r,1100));s.classList.remove('hit');setStt('Aim at next plate…')}
+
+/* ---------- camera + autofocus ---------- */
 async function startStream(){
   const tries=[
-    {video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false},
+    {video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720},focusMode:{ideal:'continuous'}},audio:false},
+    {video:{facingMode:'environment',focusMode:{ideal:'continuous'}},audio:false},
     {video:{facingMode:'environment'},audio:false},
     {video:true,audio:false}
   ];
@@ -482,6 +508,29 @@ async function startStream(){
   }
   throw err;
 }
+let focusTimer=null;
+/* asks the camera to keep focusing: continuous if supported, otherwise single-shot re-triggered every 3s */
+async function setFocus(track,mode){
+  try{await track.applyConstraints({advanced:[{focusMode:mode}]})}catch{}
+}
+async function enableAutoFocus(track){
+  if(!track||!track.getCapabilities)return;
+  const modes=track.getCapabilities().focusMode||[];
+  clearInterval(focusTimer);focusTimer=null;
+  if(modes.includes('continuous')){await setFocus(track,'continuous');return}
+  if(modes.includes('single-shot')){
+    await setFocus(track,'single-shot');
+    focusTimer=setInterval(()=>{if(active&&stream)setFocus(stream.getVideoTracks()[0],'single-shot')},3000);
+  }
+}
+/* tap the scanner window to refocus immediately */
+$('strip').addEventListener('click',()=>{
+  const t=stream?.getVideoTracks()[0];if(!t)return;
+  const modes=t.getCapabilities?.().focusMode||[];
+  if(modes.includes('single-shot'))setFocus(t,'single-shot');
+  else if(modes.includes('continuous')){setFocus(t,'single-shot');setTimeout(()=>setFocus(t,'continuous'),300)}
+});
+
 async function openScan(){
   audio();
   const my=++session;active=true;$('lb').classList.add('show');$('fab').classList.add('open');$('fabIcon').textContent='✕';setStt('Starting camera…');
@@ -490,12 +539,13 @@ async function openScan(){
     const s=await startStream();
     if(my!==session){s.getTracks().forEach(t=>t.stop());return}
     stream=s;const v=$('video');v.srcObject=s;v.muted=true;await v.play().catch(()=>{});
+    enableAutoFocus(s.getVideoTracks()[0]);
     setStt('Loading reader…');getWorker().then(()=>{if(my===session){setStt('Aim at a plate…');loop(my)}}).catch(e=>{toast('⚠️ '+e.message);closeScan()})
   }catch(e){
     const why={NotAllowedError:'permission denied',SecurityError:'blocked by browser',NotFoundError:'no camera found',NotReadableError:'camera in use by another app',OverconstrainedError:'camera settings not supported'}[e.name]||e.name||'unknown error';
     toast(`⚠️ Camera: ${why}`);closeScan()}}
 function closeScan(){
-  active=false;session++;$('lb').classList.remove('show');$('fab').classList.remove('open');$('fabIcon').textContent='📷';
+  active=false;session++;clearInterval(focusTimer);focusTimer=null;$('lb').classList.remove('show');$('fab').classList.remove('open');$('fabIcon').textContent='📷';
   $('strip').classList.remove('hit');$('torch').classList.remove('on');hits={};
   if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}$('video').srcObject=null}
 $('fab').onclick=()=>active?closeScan():openScan();
