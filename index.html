@@ -174,9 +174,13 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
   75%{opacity:1;transform:translate(-50%,-50%) scale(1)}
   100%{opacity:0;transform:translate(-50%,-50%) scale(.9)}
 }
+
+/* ---------- open counter (top left) ---------- */
+.opens{position:fixed;top:6px;left:8px;font-size:.6rem;font-weight:600;letter-spacing:.5px;color:var(--muted);opacity:.7;z-index:3000;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body data-theme="dark">
+<div class="opens" id="opens" title="Times this page has been opened">0</div>
 <div class="splash" id="splash">
   <video id="splashVid" src="assets/logo.mp4" autoplay muted playsinline preload="auto"></video>
   <img class="fallback" src="assets/landscape-logo.png" alt="Hyde Park Corner">
@@ -205,7 +209,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
 <header><h1><img class="logo" src="assets/hpc-logo.png" alt="HPC"> HPC Job Scanner</h1><div class="theme" id="theme" role="button" aria-label="Toggle theme">🌙</div></header>
 
 <label class="lbl" for="ta">Paste registrations, one per line. Add " - DONE" to mark completed.</label>
-<div class="iw"><textarea id="ta" class="ta" placeholder="BP24FCN&#10;PJ22VHO&#10;BL24RM - DONE"></textarea><button class="paste-btn" id="pasteBtn" id="addBtn" aria-label="Paste from clipboard">📋 PASTE</button></div>
+<div class="iw"><textarea id="ta" class="ta" placeholder="BP24FCN&#10;PJ22VHO&#10;BL24RM - DONE"></textarea><button class="paste-btn" id="pasteBtn" aria-label="Paste from clipboard">📋 PASTE</button></div>
 
 <div class="keys">
   <button class="key k-cyan" id="addBtn"><i>➕</i>ADD</button>
@@ -477,19 +481,23 @@ async function loop(my){
           const t=FIX(text);
           if(t.length<4){setStt('Aim at a plate…');hits={}}
           else{
-            const m=find(pending,t,1);
-            if(m&&(m.d===0||(hits[m.r]=(hits[m.r]||0)+1)>=2)){await onMatch(m.r);hits={}}
-            else if(m){setStt(`Checking ${m.r}…`);refocusNow()}
-            else{
+            const seen=find([...found,...completed],t,1);   // already scanned (tolerates 1 misread char)
+            const m=find(pending,t,1);                      // still waiting to be scanned
+            if(seen&&(!m||seen.d<=m.d)){
               hits={};
-              const o=find([...found,...completed],t,0);
-              if(o){setStt(`${o.r} already scanned`);sound('dup',o.r);scanPopup('dup','Duplicate',700)}
-              else{setStt(`Not on list: ${text.trim().slice(0,14)}`);sound('bad','bad')}
-            }}}
+              setStt(`${seen.r} already scanned`);
+              sound('dup',seen.r);
+              scanPopup('dup','Duplicate',700);
+            }
+            else if(m&&(m.d===0||(hits[m.r]=(hits[m.r]||0)+1)>=2)){await onMatch(m.r);hits={}}
+            else if(m){setStt(`Checking ${m.r}…`);refocusNow()}
+            else{hits={};setStt(`Not on list: ${text.trim().slice(0,14)}`);sound('bad','bad')}
+          }}
       }catch(e){console.warn('OCR error',e);setStt('Reader error — retrying');await new Promise(r=>setTimeout(r,1500))}
       busy=false}
     await new Promise(r=>setTimeout(r,120))}}
 async function onMatch(reg){
+  if(found.includes(reg)||completed.includes(reg))return;
   pending=pending.filter(r=>r!==reg);delete checkedItems[reg];if(!found.includes(reg))found.push(reg);fresh.add(reg);
   const s=$('strip');s.dataset.hit=reg;s.classList.add('hit');setStt(`${reg} matched ✓`);
   scanPopup('match','Match Found',500);
@@ -564,12 +572,11 @@ async function applyZoom(){
 $('zoomBtn').onclick=()=>{zoomIdx=(zoomIdx+1)%ZOOMS.length;applyZoom();sound('ok','zoom')};
 
 /* tap the scanner window to focus on that spot (mapped through the current zoom) */
-$('strip').addEventListener('click',()=>{
+$('strip').addEventListener('click',e=>{
   const t=stream?.getVideoTracks()[0];if(!t)return;
   const r=$('strip').getBoundingClientRect(),
-        x=(e=>0)(),
-        nx=0.5+((event.clientX-r.left)/r.width-0.5)/digitalZoom,
-        ny=0.5+((event.clientY-r.top)/r.height-0.5)/digitalZoom;
+        nx=0.5+((e.clientX-r.left)/r.width-0.5)/digitalZoom,
+        ny=0.5+((e.clientY-r.top)/r.height-0.5)/digitalZoom;
   refocus(t,Math.min(1,Math.max(0,nx)),Math.min(1,Math.max(0,ny)));
 });
 
@@ -605,6 +612,7 @@ window.addEventListener('load',()=>{
   let t='dark',s=null;try{t=localStorage.getItem('regscanner_theme')||'dark';s=localStorage.getItem('hpcData')}catch{}
   setTheme(t);
   if(s)try{const o=JSON.parse(s);found=o.found||[];pending=o.pending||[];completed=o.completed||[];notes=o.notes||{};checkedItems=o.checkedItems||{};[...found,...pending,...completed].forEach(r=>fresh.add(r))}catch{}
+  try{const n=(parseInt(localStorage.getItem('hpcOpens')||'0',10))+1;localStorage.setItem('hpcOpens',n);$('opens').textContent=n}catch{}
   render()});
 </script>
 </body>
