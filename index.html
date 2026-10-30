@@ -175,19 +175,20 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
   100%{opacity:0;transform:translate(-50%,-50%) scale(.9)}
 }
 
-/* ---------- bottom-left view counter ---------- */
-#hpc4 {
-  position: fixed; left: 16px; bottom: 10px; z-index: 950;
+/* ---------- site counter (top left) ---------- */
+#hpc1 {
+  position: fixed; left: 5px; top: 1px;
   font-family: system-ui, -apple-system, sans-serif;
-  font-size: 18px; opacity: 0.7;
-  padding: 8px 16px; border-radius: 999px;
-  background: linear-gradient(135deg, #6a11cb, #2575fc);
-  color: #fff; text-decoration: none; font-weight: 600;
-  box-shadow: 0 6px 18px rgba(37, 117, 252, 0.35);
+  font-size: 14px; opacity: 0.7;
+  color: #89CC26; text-decoration: none; z-index: 3000;
 }
+#hpc1:hover { text-decoration: underline; }
 </style>
 </head>
 <body data-theme="dark">
+<a id="hpc1" href="https://compstarali1.github.io/Scanner-HPC/" target="_blank" rel="noopener">
+  Opened- <span id="hpc1-count">…</span> times
+</a>
 <div class="splash" id="splash">
   <video id="splashVid" src="assets/logo.mp4" autoplay muted playsinline preload="auto"></video>
   <img class="fallback" src="assets/landscape-logo.png" alt="Hyde Park Corner">
@@ -621,16 +622,12 @@ window.addEventListener('load',()=>{
   if(s)try{const o=JSON.parse(s);found=o.found||[];pending=o.pending||[];completed=o.completed||[];notes=o.notes||{};checkedItems=o.checkedItems||{};[...found,...pending,...completed].forEach(r=>fresh.add(r))}catch{}
   render()});
 </script>
-
-<!-- Bottom-left view counter -->
-<a id="hpc4" href="https://compstarali1.github.io/Scanner-HPC/" target="_blank" rel="noopener">
-  Scanner-HPC · <span id="hpc4-count">…</span> views
-</a>
 <script>
-  fetch("https://abacus.jasoncameron.dev/hit/scanner-hpc/opens")
-    .then(r => r.json())
-    .then(d => document.getElementById("hpc4-count").textContent = d.value)
-    .catch(() => document.getElementById("hpc4-count").textContent = "—");
+/* site counter: counts page loads via abacus.jasoncameron.dev */
+fetch("https://abacus.jasoncameron.dev/hit/scanner-hpc/opens")
+  .then(r => r.json())
+  .then(d => document.getElementById("hpc1-count").textContent = d.value)
+  .catch(() => document.getElementById("hpc1-count").textContent = "—");
 </script>
 </body>
-</html>
+  </html>
