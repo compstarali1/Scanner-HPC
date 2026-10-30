@@ -40,6 +40,12 @@ h1{font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:8px}
 .key i{font-style:normal;font-size:1.2rem;line-height:1.1;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
 .key:hover{--ty:-2px;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -3px 8px rgba(0,0,0,.18),0 7px 0 rgba(var(--s),.6),0 16px 26px rgba(0,0,0,.4),0 0 22px rgba(var(--c),.25)}
 .key:active{--ty:5px;transition-duration:.06s;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 3px 8px rgba(0,0,0,.25),0 0 0 rgba(var(--s),.6),0 3px 6px rgba(0,0,0,.35)}
+/* blinking neon ring on ADD while the paste box has text */
+.key.hint{outline:2px solid var(--cyan);outline-offset:3px;animation:neonBlink .8s steps(1,end) infinite}
+@keyframes neonBlink{
+  0%,49%{outline-color:var(--cyan);filter:drop-shadow(0 0 6px rgba(52,231,228,.9))}
+  50%,100%{outline-color:transparent;filter:none}
+}
 .k-cyan{--c:52,231,228;--s:10,86,90}.k-green{--c:45,212,167;--s:8,80,62}.k-red{--c:248,113,113;--s:110,30,30}.k-blue{--c:91,140,255;--s:25,45,120}.k-amber{--c:255,179,71;--s:110,70,10}
 .key.wide{flex-direction:row;gap:8px;font-size:.8rem;min-height:48px}
 .rip{position:absolute;border-radius:50%;background:#fff;opacity:.35;transform:scale(0);animation:rip .6s ease-out forwards;pointer-events:none}
@@ -312,7 +318,10 @@ const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const save=()=>{try{localStorage.setItem('hpcData',JSON.stringify({found,pending,completed,notes,checkedItems}))}catch{}};
 
 /* ---------- helpers ---------- */
-ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px'});
+/* blink the ADD button's neon ring while the paste box has text */
+const addBtnEl=$('addBtn');
+function syncAddHint(){addBtnEl.classList.toggle('hint',ta.value.trim().length>0)}
+ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';syncAddHint()});
 function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;$('toasts').appendChild(t);setTimeout(()=>{t.classList.add('bye');setTimeout(()=>t.remove(),300)},2900)}
 /* centre-screen scan popup: type 'dup' (yellow) or 'match' (green), shown for ms milliseconds */
 function scanPopup(type,text,ms){
@@ -405,7 +414,7 @@ function parse(){
     if([...found,...pending,...completed].includes(reg)){s++;return}
     fresh.add(reg);if(isDone){completed.push(reg);d++}else{pending.push(reg);a++}});
   const parts=[a&&`✅ ${a} added`,d&&`✅ ${d} completed`,s&&`⚠️ ${s} duplicate${s>1?'s':''}`].filter(Boolean);
-  if(!parts.length)shake(ta);else{ta.value='';ta.style.height='auto';burstAt($('addBtn'))}
+  if(!parts.length)shake(ta);else{ta.value='';ta.style.height='auto';syncAddHint();burstAt($('addBtn'))}
   toast(parts.join(' | ')||'⚠️ No valid registrations found');render()}
 $('addBtn').onclick=parse;
 
@@ -542,7 +551,7 @@ $('restoreBtn').onclick=()=>{const i=document.createElement('input');i.type='fil
   i.onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();
     rd.onload=ev=>{try{const o=JSON.parse(ev.target.result);found=o.found||[];pending=o.pending||[];completed=o.completed||[];notes=o.notes||{};checkedItems=o.checkedItems||{};
       [...found,...pending,...completed].forEach(r=>fresh.add(r));$('moreModal').classList.remove('show');render();toast('⬆ Restored')}catch{toast('⚠️ Invalid file')}};rd.readAsText(f)};i.click()};
-$('resetBtn').onclick=async()=>{if(await ask('Reset ALL data? This cannot be undone.')){found=[];pending=[];completed=[];notes={};checkedItems={};ta.value='';$('moreModal').classList.remove('show');render();toast('♻️ All data reset')}};
+$('resetBtn').onclick=async()=>{if(await ask('Reset ALL data? This cannot be undone.')){found=[];pending=[];completed=[];notes={};checkedItems={};ta.value='';syncAddHint();$('moreModal').classList.remove('show');render();toast('♻️ All data reset')}};
 
 /* ---------- sounds ---------- */
 let ac=null,lastSnd=0,lastKey='';
