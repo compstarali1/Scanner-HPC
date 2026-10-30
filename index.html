@@ -34,10 +34,10 @@ h1{font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:8px}
 .paste-btn:active{transform:scale(.92)}
 
 /* 3D frosted keys */
-.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
-.key{--c:255,255,255;--s:0,0,0;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:56px;padding:6px 4px;border-radius:14px;border:1px solid rgba(var(--c),.3);background:linear-gradient(160deg,rgba(var(--c),.26),rgba(var(--c),.07));backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);color:var(--text);font-size:.66rem;font-weight:700;letter-spacing:.4px;cursor:pointer;transform:perspective(500px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px));box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -3px 8px rgba(0,0,0,.18),0 5px 0 rgba(var(--s),.6),0 12px 20px rgba(0,0,0,.35);transition:transform .18s var(--spring),box-shadow .18s}
+.keys{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:18px}
+.key{--c:255,255,255;--s:0,0,0;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:56px;padding:6px 2px;border-radius:14px;border:1px solid rgba(var(--c),.3);background:linear-gradient(160deg,rgba(var(--c),.26),rgba(var(--c),.07));backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);color:var(--text);font-size:.62rem;font-weight:700;letter-spacing:.3px;cursor:pointer;transform:perspective(500px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px));box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -3px 8px rgba(0,0,0,.18),0 5px 0 rgba(var(--s),.6),0 12px 20px rgba(0,0,0,.35);transition:transform .18s var(--spring),box-shadow .18s}
 .key::before{content:"";position:absolute;inset:0 0 55% 0;background:linear-gradient(180deg,rgba(255,255,255,.28),transparent);pointer-events:none;border-radius:14px 14px 40% 40%}
-.key i{font-style:normal;font-size:1.25rem;line-height:1.1;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+.key i{font-style:normal;font-size:1.2rem;line-height:1.1;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
 .key:hover{--ty:-2px;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -3px 8px rgba(0,0,0,.18),0 7px 0 rgba(var(--s),.6),0 16px 26px rgba(0,0,0,.4),0 0 22px rgba(var(--c),.25)}
 .key:active{--ty:5px;transition-duration:.06s;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 3px 8px rgba(0,0,0,.25),0 0 0 rgba(var(--s),.6),0 3px 6px rgba(0,0,0,.35)}
 .k-cyan{--c:52,231,228;--s:10,86,90}.k-green{--c:45,212,167;--s:8,80,62}.k-red{--c:248,113,113;--s:110,30,30}.k-blue{--c:91,140,255;--s:25,45,120}.k-amber{--c:255,179,71;--s:110,70,10}
@@ -175,6 +175,12 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
   100%{opacity:0;transform:translate(-50%,-50%) scale(.9)}
 }
 
+/* ---------- import progress ---------- */
+.import-bar{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:2500;width:min(88vw,340px);padding:10px 14px;border-radius:14px;background:var(--glass);border:1px solid var(--gb);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 10px 30px rgba(0,0,0,.4);font-size:.78rem;color:var(--text);opacity:0;pointer-events:none;transition:opacity .25s}
+.import-bar.show{opacity:1}
+.import-track{height:4px;border-radius:2px;background:var(--gb);margin-top:7px;overflow:hidden}
+.import-fill{height:100%;width:0;background:var(--cyan);transition:width .2s}
+
 /* ---------- site counters (top left) ---------- */
 #hpcBar {
   position: fixed; left: 5px; top: 1px; z-index: 3000;
@@ -231,8 +237,10 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
   <button class="key k-cyan" id="addBtn"><i>➕</i>ADD</button>
   <button class="key k-green" id="doneBtn"><i>✓</i>DONE</button>
   <button class="key k-red" id="delBtn"><i>🗑</i>DELETE</button>
+  <button class="key k-amber" id="importBtn"><i>🖼</i>IMPORT</button>
   <button class="key k-blue" id="moreBtn"><i>⚙</i>MORE</button>
 </div>
+<input type="file" id="importFile" accept="image/*" class="hidden">
 
 <div class="stats">
   <div class="stat cyan" id="s-found"><div class="sv" id="foundCount">0</div><div class="sl">FOUND</div></div>
@@ -272,6 +280,9 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
   <div class="lbbar"><div class="stt" id="stt">Starting…</div><button class="zbtn" id="zoomBtn" aria-label="Zoom level">1×</button><button class="round" id="torch" aria-label="Torch">🔦</button></div>
 </div>
 <button class="fab" id="fab" aria-label="Open scanner"><span id="fabIcon">📷</span></button>
+
+<!-- Import progress -->
+<div class="import-bar" id="importBar"><div id="importMsg">Reading screenshot…</div><div class="import-track"><div class="import-fill" id="importFill"></div></div></div>
 
 <!-- Tools sheet -->
 <div class="modal" id="moreModal"><div class="mc">
@@ -417,6 +428,105 @@ $('delBtn').onclick=async()=>{
   if(!sel.length){shake($('delBtn'));return toast('⚠️ Tick pending items first')}
   if(await ask(`Remove ${sel.length} selected item(s)?`))leave(sel,()=>{pending=pending.filter(p=>!sel.includes(p));sel.forEach(r=>delete checkedItems[r]);toast(`🗑️ Removed ${sel.length}`);render()})};
 $('selAll').onclick=()=>{const all=pending.every(r=>checkedItems[r]);pending.forEach(r=>checkedItems[r]=!all);render()};
+
+/* ---------- screenshot import ---------- */
+/* Known-noise words that look like plates (OCR often reads signage, dealer names, etc.) */
+const NOISE=new Set(['DEALER','DEALERS','HPC','ADDRESS','VEHICLE','REGISTRATION','MILEAGE','PRICE','CHECK','SCAN','JOB','JOBS','PENDING','FOUND','DONE','TOTAL','COMPLETED','REMAINING','HYDE','PARK','CORNER','LONDON','UK','ALL','DATE','TIME','NEXT','BACK','STOP','VIN','YEAR','MAKE','MODEL','COLOUR','COLOR','FUEL','PETROL','DIESEL','AUTO','MANUAL']);
+/* UK plate shapes: current (AB12CDE), prefix (A123BCD), suffix (ABC123D), dateless (ABC1234 style) */
+const UK_PLATE=/^(?:[A-Z]{2}[0-9]{2}[A-Z]{3}|[A-Z][0-9]{1,3}[A-Z]{3}|[A-Z]{3}[0-9]{1,3}[A-Z]|[A-Z]{1,3}[0-9]{1,4})$/;
+/* common OCR confusions, applied only to the letter or digit slots a plate needs */
+const TO_LETTER={'0':'O','1':'I','2':'Z','5':'S','8':'B','6':'G'};
+const TO_DIGIT={'O':'0','Q':'0','D':'0','I':'1','L':'1','Z':'2','S':'5','B':'8','G':'6'};
+/* Fit a raw token into a plate shape by fixing letter/digit slots that OCR confused */
+function normalisePlate(raw){
+  const s=raw.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(s.length<5||s.length>8)return null;
+  if(UK_PLATE.test(s))return s;
+  // try the 2-2-3 current format pattern: letters, digits, letters
+  const pattern=[ 'L','L','D','D','L','L','L' ];
+  if(s.length===7){
+    const fixed=[...s].map((c,i)=>pattern[i]==='L'?(/[0-9]/.test(c)?TO_LETTER[c]||c:c):(/[A-Z]/.test(c)?TO_DIGIT[c]||c:c)).join('');
+    if(UK_PLATE.test(fixed))return fixed;
+  }
+  return null;
+}
+/* Extract candidate registrations from OCR text, ignoring noise, and deduplicated */
+function extractRegs(text){
+  const found=new Set();
+  const tokens=text.toUpperCase().split(/[\s,;:|()\[\]{}"'`~\-_.\/\\]+/);
+  for(const tok of tokens){
+    if(!tok||NOISE.has(tok))continue;
+    if(tok.length<5||tok.length>8)continue;
+    const plate=normalisePlate(tok);
+    if(plate&&!NOISE.has(plate))found.add(plate);
+  }
+  // Also catch plates split across two OCR tokens, e.g. "BP24 FCN"
+  const joined=text.toUpperCase().replace(/([A-Z0-9]{2,4})\s+([A-Z0-9]{2,4})/g,'$1$2');
+  for(const tok of joined.split(/[^A-Z0-9]+/)){
+    if(tok.length<5||tok.length>8||NOISE.has(tok))continue;
+    const plate=normalisePlate(tok);
+    if(plate)found.add(plate);
+  }
+  return [...found];
+}
+/* Preprocess: scale, grayscale, stretch contrast; optionally threshold/invert for light-on-dark plates */
+function preprocess(img,mode){
+  const maxW=1600,scale=Math.min(1,maxW/img.naturalWidth),w=Math.round(img.naturalWidth*scale),h=Math.round(img.naturalHeight*scale);
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,w,h);
+  const im=x.getImageData(0,0,w,h),p=im.data;let lo=255,hi=0;
+  for(let i=0;i<p.length;i+=4){const g=(p[i]*.3+p[i+1]*.59+p[i+2]*.11)|0;p[i]=g;if(g<lo)lo=g;if(g>hi)hi=g}
+  const k=255/Math.max(40,hi-lo);
+  for(let i=0;i<p.length;i+=4){let g=Math.max(0,Math.min(255,(p[i]-lo)*k));
+    if(mode==='threshold'){g=g>128?255:0}
+    if(mode==='invert'){g=255-g;g=g>128?255:0}
+    p[i]=p[i+1]=p[i+2]=g}
+  x.putImageData(im,0,0);return c}
+function loadImage(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),i=new Image();
+  i.onload=()=>{URL.revokeObjectURL(u);res(i)};i.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('Could not read image'))};i.src=u})}
+function setImportProgress(msg,frac){$('importMsg').textContent=msg;$('importFill').style.width=(frac*100)+'%'}
+async function importScreenshot(file){
+  const bar=$('importBar');bar.classList.add('show');setImportProgress('Reading screenshot…',.05);
+  try{
+    if(typeof Tesseract==='undefined')throw new Error('OCR library not loaded (check internet)');
+    const img=await loadImage(file);
+    const found=new Set();
+    // Pass 1: dark text on light background; Pass 2: light text on dark (inverted)
+    const passes=[['normal','Reading text…'],['invert','Checking light-on-dark…']];
+    const worker=await Tesseract.createWorker('eng',1,{logger:m=>{
+      if(m.status==='recognizing text')setImportProgress(m.status==='recognizing text'?'Reading text…':'',.2+m.progress*.7)}});
+    await worker.setParameters({tessedit_char_whitelist:'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 \n',tessedit_pageseg_mode:'11',preserve_interword_spaces:'1'});
+    for(let i=0;i<passes.length;i++){
+      const [mode,label]=passes[i];
+      setImportProgress(label,.1+i*.45);
+      const canvas=preprocess(img,mode==='normal'?'contrast':'invert');
+      const {data:{text}}=await worker.recognize(canvas);
+      extractRegs(text).forEach(r=>found.add(r));
+    }
+    await worker.terminate();
+    setImportProgress('Matching against your list…',.97);
+    const existing=new Set([...found.values()].filter(r=>[...this_found_placeholder()].includes(r)));
+    const all=[...found];
+    const fresh_=all.filter(r=>![...pending,...completed,...window.__found__].includes(r));
+    const dupes=all.length-fresh_.length;
+    if(!fresh_.length){
+      bar.classList.remove('show');
+      return toast(all.length?`⚠️ All ${all.length} already on your list`:'⚠️ No registrations found in screenshot');
+    }
+    const existingText=ta.value.trim();
+    ta.value=(existingText?existingText+'\n':'')+fresh_.join('\n');
+    ta.dispatchEvent(new Event('input'));
+    bar.classList.remove('show');
+    burstAt($('importBtn'));
+    toast(`🖼 ${fresh_.length} registration${fresh_.length>1?'s':''} imported${dupes?` | ⚠️ ${dupes} already listed`:''}`);
+  }catch(e){
+    bar.classList.remove('show');
+    toast('⚠️ Import failed: '+(e.message||'unknown error'));
+  }
+}
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').addEventListener('change',e=>{
+  const f=e.target.files[0];e.target.value='';if(f)importScreenshot(f)});
 
 /* ---------- tools sheet ---------- */
 const stamp=()=>{const d=new Date();return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`};
