@@ -175,12 +175,19 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
   100%{opacity:0;transform:translate(-50%,-50%) scale(.9)}
 }
 
-/* ---------- open counter (top left) ---------- */
-.opens{position:fixed;top:6px;left:8px;font-size:.6rem;font-weight:600;letter-spacing:.5px;color:var(--muted);opacity:.7;z-index:3000;font-variant-numeric:tabular-nums}
+/* ---------- bottom-left view counter ---------- */
+#hpc4 {
+  position: fixed; left: 16px; bottom: 10px; z-index: 950;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 18px; opacity: 0.7;
+  padding: 8px 16px; border-radius: 999px;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: #fff; text-decoration: none; font-weight: 600;
+  box-shadow: 0 6px 18px rgba(37, 117, 252, 0.35);
+}
 </style>
 </head>
 <body data-theme="dark">
-<div class="opens" id="opens" title="Times this page has been opened">0</div>
 <div class="splash" id="splash">
   <video id="splashVid" src="assets/logo.mp4" autoplay muted playsinline preload="auto"></video>
   <img class="fallback" src="assets/landscape-logo.png" alt="Hyde Park Corner">
@@ -612,8 +619,18 @@ window.addEventListener('load',()=>{
   let t='dark',s=null;try{t=localStorage.getItem('regscanner_theme')||'dark';s=localStorage.getItem('hpcData')}catch{}
   setTheme(t);
   if(s)try{const o=JSON.parse(s);found=o.found||[];pending=o.pending||[];completed=o.completed||[];notes=o.notes||{};checkedItems=o.checkedItems||{};[...found,...pending,...completed].forEach(r=>fresh.add(r))}catch{}
-  try{const n=(parseInt(localStorage.getItem('hpcOpens')||'0',10))+1;localStorage.setItem('hpcOpens',n);$('opens').textContent=n}catch{}
   render()});
+</script>
+
+<!-- Bottom-left view counter -->
+<a id="hpc4" href="https://compstarali1.github.io/Scanner-HPC/" target="_blank" rel="noopener">
+  Scanner-HPC · <span id="hpc4-count">…</span> views
+</a>
+<script>
+  fetch("https://abacus.jasoncameron.dev/hit/scanner-hpc/opens")
+    .then(r => r.json())
+    .then(d => document.getElementById("hpc4-count").textContent = d.value)
+    .catch(() => document.getElementById("hpc4-count").textContent = "—");
 </script>
 </body>
 </html>
