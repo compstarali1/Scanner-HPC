@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>HPC — Smart Job Scanner</title>
-<link rel="icon" href="https://raw.githubusercontent.com/compstarali1/Scanner-HPC/9e2bc7ddf1a6c7e904840bba81016e4ffe6a6348/assets/icon.png">
-<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/compstarali1/Scanner-HPC/9e2bc7ddf1a6c7e904840bba81016e4ffe6a6348/assets/icon.png">
+<link rel="icon" href="https://raw.githubusercontent.com/compstarali1/Scanner-HPC/ffe7b6019b24695a3d70023f27d8a2de804e8ef3/assets/icon.png">
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/compstarali1/Scanner-HPC/ffe7b6019b24695a3d70023f27d8a2de804e8ef3/assets/icon.png">
 <meta name="theme-color" content="#0a0e1a">
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
 <style>
@@ -155,8 +155,8 @@ video{width:100%;height:100%;object-fit:cover;display:block;transition:transform
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
 /* ---------- branding: backgrounds, hills, logos, splash ---------- */
-:root{--bgimg:url('https://raw.githubusercontent.com/compstarali1/Scanner-HPC/9e2bc7ddf1a6c7e904840bba81016e4ffe6a6348/assets/background-dark.jpg');--scrim:rgba(6,9,18,.66)}
-[data-theme="light"]{--bgimg:url('https://raw.githubusercontent.com/compstarali1/Scanner-HPC/9e2bc7ddf1a6c7e904840bba81016e4ffe6a6348/assets/background_light.png');--scrim:rgba(233,238,248,.6)}
+:root{--bgimg:url('https://raw.githubusercontent.com/compstarali1/Scanner-HPC/ffe7b6019b24695a3d70023f27d8a2de804e8ef3/assets/background-dark.jpg');--scrim:rgba(6,9,18,.66)}
+[data-theme="light"]{--bgimg:url('https://raw.githubusercontent.com/compstarali1/Scanner-HPC/ffe7b6019b24695a3d70023f27d8a2de804e8ef3/assets/background_light.png');--scrim:rgba(233,238,248,.6)}
 body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;background:linear-gradient(var(--scrim),var(--scrim)),var(--bgimg) center top/cover no-repeat}
 .hills{position:fixed;left:0;right:0;bottom:0;width:100%;height:auto;z-index:1;opacity:.6;pointer-events:none;-webkit-mask-image:linear-gradient(transparent,#000 45%);mask-image:linear-gradient(transparent,#000 45%)}
 .logo{height:38px;width:auto;display:block;filter:drop-shadow(0 3px 8px rgba(0,0,0,.45))}
@@ -210,8 +210,8 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
   </a>
 </div>
 <div class="splash" id="splash">
-  <video id="splashVid" src="https://raw.githubusercontent.com/compstarali1/Scanner-HPC/9e2bc7ddf1a6c7e904840bba81016e4ffe6a6348/assets/logo.mp4" autoplay muted playsinline preload="auto"></video>
-  <img class="fallback" src="https://raw.githubusercontent.com/compstarali1/Scanner-HPC/9e2bc7ddf1a6c7e904840bba81016e4ffe6a6348/assets/landscape-logo.png" alt="Hyde Park Corner">
+  <video id="splashVid" src="https://raw.githubusercontent.com/compstarali1/Scanner-HPC/ffe7b6019b24695a3d70023f27d8a2de804e8ef3/assets/logo.mp4" autoplay muted playsinline preload="auto"></video>
+  <img class="fallback" src="https://raw.githubusercontent.com/compstarali1/Scanner-HPC/ffe7b6019b24695a3d70023f27d8a2de804e8ef3/assets/landscape-logo.png" alt="Hyde Park Corner">
   <div class="skip">TAP TO SKIP</div>
 </div>
 <script>
@@ -230,11 +230,11 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
   var p=v.play&&v.play();if(p&&p.catch)p.catch(fail);
 })();
 </script>
-<img class="hills" src="https://raw.githubusercontent.com/compstarali1/Scanner-HPC/9e2bc7ddf1a6c7e904840bba81016e4ffe6a6348/assets/hills-landscape.png" alt="">
+<img class="hills" src="https://raw.githubusercontent.com/compstarali1/Scanner-HPC/ffe7b6019b24695a3d70023f27d8a2de804e8ef3/assets/hills-landscape.png" alt="">
 <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
 <div class="toasts" id="toasts"></div>
 <div class="container">
-<header><h1><img class="logo" src="https://raw.githubusercontent.com/compstarali1/Scanner-HPC/9e2bc7ddf1a6c7e904840bba81016e4ffe6a6348/assets/hpc-logo.png" alt="HPC"> HPC Job Scanner</h1><div class="theme" id="theme" role="button" aria-label="Toggle theme">🌙</div></header>
+<header><h1><img class="logo" src="https://raw.githubusercontent.com/compstarali1/Scanner-HPC/ffe7b6019b24695a3d70023f27d8a2de804e8ef3/assets/hpc-logo.png" alt="HPC"> HPC Job Scanner</h1><div class="theme" id="theme" role="button" aria-label="Toggle theme">🌙</div></header>
 
 <label class="lbl" for="ta">Paste registrations, one per line. Add " - DONE" to mark completed.</label>
 <div class="iw"><textarea id="ta" class="ta" placeholder="BP24FCN&#10;PJ22VHO&#10;BL24RM - DONE"></textarea><button class="paste-btn" id="pasteBtn" aria-label="Paste from clipboard">📋 PASTE</button></div>
@@ -270,12 +270,12 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
   </div>
 </div>
 
-<div class="brand"><img id="brandLogo" src="https://raw.githubusercontent.com/compstarali1/Scanner-HPC/9e2bc7ddf1a6c7e904840bba81016e4ffe6a6348/assets/landscape-logo.gif" alt="Hyde Park Corner"></div>
+<div class="brand"><img id="brandLogo" src="https://raw.githubusercontent.com/compstarali1/Scanner-HPC/ffe7b6019b24695a3d70023f27d8a2de804e8ef3/assets/landscape-logo.gif" alt="Hyde Park Corner"></div>
 <script>
 /* bottom logo: animated GIF runs for 8 seconds, then switches to the static PNG to reduce processor load */
 (function(){
   var img=document.getElementById('brandLogo');
-  setTimeout(function(){img.src='https://raw.githubusercontent.com/compstarali1/Scanner-HPC/9e2bc7ddf1a6c7e904840bba81016e4ffe6a6348/assets/landscape-logo.png'},8000);
+  setTimeout(function(){img.src='https://raw.githubusercontent.com/compstarali1/Scanner-HPC/ffe7b6019b24695a3d70023f27d8a2de804e8ef3/assets/landscape-logo.png'},8000);
 })();
 </script>
 </div>
@@ -783,4 +783,4 @@ window.addEventListener('load',()=>{
 })();
 </script>
 </body>
-</html>
+  </html>
