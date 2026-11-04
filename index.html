@@ -198,6 +198,17 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
 #hpcBar a:hover { text-decoration: underline; }
 #hpc1 { color: #89CC26; }
 #hpc2 { color: #ff3b3b; }
+
+/* ---------- help button + tips overlay ---------- */
+.help-fab{position:fixed;top:20px;left:20px;width:42px;height:42px;border-radius:50%;z-index:3100;display:grid;place-items:center;font-size:1.1rem;font-weight:900;color:#1a1200;cursor:pointer;border:1px solid rgba(255,255,255,.5);background:radial-gradient(circle at 30% 25%,#fff3b0,#ffb347 60%,#c8801a);box-shadow:inset 0 2px 0 rgba(255,255,255,.6),inset 0 -3px 6px rgba(0,0,0,.25),0 5px 0 #6e4a0a,0 10px 18px rgba(0,0,0,.45);transition:transform .18s var(--spring),box-shadow .18s}
+.help-fab:active{transform:translateY(4px);box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 1px 0 #6e4a0a,0 3px 6px rgba(0,0,0,.4)}
+.help-fab.on{background:radial-gradient(circle at 30% 25%,#fff,#ffd23f 50%)}
+#helpOverlay{position:fixed;inset:0;z-index:4500;background:rgba(5,8,16,.3);opacity:0;pointer-events:none;transition:opacity .25s}
+#helpOverlay.show{opacity:1;pointer-events:auto}
+.hl{position:fixed;border:3px solid #ffd23f;border-radius:14px;box-shadow:0 0 0 2px #000,0 0 0 5px rgba(255,210,63,.35),0 0 22px rgba(255,210,63,.7);pointer-events:none;animation:hlPulse 1.2s ease-in-out infinite}
+@keyframes hlPulse{50%{box-shadow:0 0 0 2px #000,0 0 0 8px rgba(255,210,63,.1),0 0 32px rgba(255,210,63,.95)}}
+.hl-num{position:absolute;top:-14px;left:-14px;width:30px;height:30px;border-radius:50%;background:#ffd23f;color:#000;border:2px solid #000;font-weight:900;font-size:.95rem;display:grid;place-items:center;box-shadow:0 0 0 2px #fff}
+.hl-txt{position:fixed;padding:10px 12px;border-radius:12px;background:#0a0e1a;color:#fff;border:2px solid #ffd23f;font-size:.82rem;line-height:1.4;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.6);pointer-events:none}
 </style>
 </head>
 <body data-theme="dark">
@@ -780,6 +791,63 @@ window.addEventListener('load',()=>{
     .then(r => r.json())
     .then(d => show('hpc2-count', d.value))
     .catch(() => show('hpc2-count', '—'));
+})();
+</script>
+
+<button class="help-fab" id="helpBtn" aria-label="Help" aria-expanded="false">?</button>
+<div id="helpOverlay" aria-hidden="true"></div>
+<script>
+/* help tips: highlights the four numbered controls with a number badge and tip text */
+(function(){
+  const TIPS=[
+    {sel:'#ta',      text:'Paste or type here, or screenshot of the registrations email by [Import] button one registration per line. Add " - DONE" to mark a job completed.'},
+    {sel:'#addBtn',  text:'ADD: moves the registrations in the box into Pending (or Completed if marked DONE).'},
+    {sel:'#fab',     text:'Camera: opens the live scanner. Aim at a plate and it is matched against your list.'},
+    {sel:'#moreBtn', text:'MORE: export your lists, save or restore a backup, or reset all data.'}
+  ];
+  const btn=document.getElementById('helpBtn'), ov=document.getElementById('helpOverlay');
+  let open=false;
+
+  function layout(){
+    ov.innerHTML='';
+    const W=innerWidth,H=innerHeight,pad=6;
+    TIPS.forEach((t,i)=>{
+      const el=document.querySelector(t.sel);
+      if(!el)return;
+      const r=el.getBoundingClientRect();
+
+      const box=document.createElement('div');
+      box.className='hl';
+      box.style.cssText=`left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px`;
+      const num=document.createElement('div');
+      num.className='hl-num';
+      num.textContent=i+1;
+      box.appendChild(num);
+      ov.appendChild(box);
+
+      const tip=document.createElement('div');
+      tip.className='hl-txt';
+      tip.textContent=`${i+1}. ${t.text}`;
+      const w=Math.min(230,W-24);
+      tip.style.width=w+'px';
+      ov.appendChild(tip);
+      const h=tip.offsetHeight;
+
+      let left=Math.min(Math.max(12,r.left),W-w-12);
+      let top=r.bottom+pad+14;
+      if(top+h>H-12) top=r.top-pad-14-h;   /* not enough room below: place above */
+      if(top<12) top=12;
+      tip.style.left=left+'px';
+      tip.style.top=top+'px';
+    });
+  }
+  function show(){open=true;layout();ov.classList.add('show');btn.classList.add('on');btn.setAttribute('aria-expanded','true')}
+  function hide(){open=false;ov.classList.remove('show');ov.innerHTML='';btn.classList.remove('on');btn.setAttribute('aria-expanded','false')}
+
+  btn.addEventListener('click',e=>{e.stopPropagation();open?hide():show()});
+  ov.addEventListener('click',hide);             /* tap anywhere on the overlay to close it */
+  addEventListener('resize',()=>{if(open)layout()});
+  addEventListener('scroll',()=>{if(open)layout()},{passive:true});
 })();
 </script>
 </body>
