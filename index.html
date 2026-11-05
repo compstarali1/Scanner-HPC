@@ -199,16 +199,53 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
 #hpc1 { color: #89CC26; }
 #hpc2 { color: #ff3b3b; }
 
-/* ---------- help button + tips overlay ---------- */
-.help-fab{position:fixed;top:20px;left:20px;width:42px;height:42px;border-radius:50%;z-index:3100;display:grid;place-items:center;font-size:1.1rem;font-weight:900;color:#1a1200;cursor:pointer;border:1px solid rgba(255,255,255,.5);background:radial-gradient(circle at 30% 25%,#fff3b0,#ffb347 60%,#c8801a);box-shadow:inset 0 2px 0 rgba(255,255,255,.6),inset 0 -3px 6px rgba(0,0,0,.25),0 5px 0 #6e4a0a,0 10px 18px rgba(0,0,0,.45);transition:transform .18s var(--spring),box-shadow .18s}
-.help-fab:active{transform:translateY(4px);box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 1px 0 #6e4a0a,0 3px 6px rgba(0,0,0,.4)}
-.help-fab.on{background:radial-gradient(circle at 30% 25%,#fff,#ffd23f 50%)}
-#helpOverlay{position:fixed;inset:0;z-index:4500;background:rgba(5,8,16,.3);opacity:0;pointer-events:none;transition:opacity .25s}
+/* ---------- help: sequenced guided tour ---------- */
+.hdr-tools{display:flex;align-items:center;gap:8px}
+.help-fab{position:relative;z-index:3100;width:38px;height:38px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:1.1rem;font-weight:900;color:#1a1200;cursor:pointer;border:1px solid rgba(255,255,255,.7);background:radial-gradient(circle at 30% 25%,#fff3b0,#ffb347 60%,#c8801a);box-shadow:inset 0 2px 0 rgba(255,255,255,.6),inset 0 -3px 6px rgba(0,0,0,.25),0 5px 0 #6e4a0a,0 10px 18px rgba(0,0,0,.45);transition:transform .18s var(--spring),box-shadow .18s}
+.help-fab:active{transform:translateY(4px);box-shadow:inset 0 2px 0 rgba(255,255,255,.6),0 1px 0 #6e4a0a,0 3px 6px rgba(0,0,0,.4)}
+.help-fab.on{background:radial-gradient(circle at 30% 25%,#fff,#ffd23f 70%);z-index:4700}
+
+#helpOverlay{position:fixed;inset:0;z-index:4500;background:radial-gradient(ellipse at center,rgba(5,8,16,.5),rgba(5,8,16,.62));opacity:0;pointer-events:none;transition:opacity .35s}
 #helpOverlay.show{opacity:1;pointer-events:auto}
-.hl{position:fixed;border:3px solid #ffd23f;border-radius:14px;box-shadow:0 0 0 2px #000,0 0 0 5px rgba(255,210,63,.35),0 0 22px rgba(255,210,63,.7);pointer-events:none;animation:hlPulse 1.2s ease-in-out infinite}
-@keyframes hlPulse{50%{box-shadow:0 0 0 2px #000,0 0 0 8px rgba(255,210,63,.1),0 0 32px rgba(255,210,63,.95)}}
-.hl-num{position:absolute;top:-14px;left:-14px;width:30px;height:30px;border-radius:50%;background:#ffd23f;color:#000;border:2px solid #000;font-weight:900;font-size:.95rem;display:grid;place-items:center;box-shadow:0 0 0 2px #fff}
-.hl-txt{position:fixed;padding:10px 12px;border-radius:12px;background:#0a0e1a;color:#fff;border:2px solid #ffd23f;font-size:.82rem;line-height:1.4;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.6);pointer-events:none}
+
+@keyframes hlBoxIn{from{opacity:0;transform:perspective(700px) rotateX(40deg) scale(1.08)}to{opacity:1;transform:none}}
+@keyframes hlPulse{0%,100%{box-shadow:0 0 0 2px #000,0 0 0 5px rgba(255,210,63,.35),0 0 22px rgba(255,210,63,.7)}50%{box-shadow:0 0 0 2px #000,0 0 0 9px rgba(255,210,63,.08),0 0 34px rgba(255,210,63,.95)}}
+@keyframes hlTipIn{from{opacity:0;transform:perspective(700px) rotateX(-25deg) translateY(16px) scale(.92)}to{opacity:1;transform:none}}
+@keyframes hlOut{to{opacity:0;transform:perspective(700px) rotateX(-20deg) translateY(-14px) scale(.94)}}
+@keyframes badgePop{from{transform:scale(0) rotate(-200deg)}to{transform:none}}
+@keyframes hlBar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+
+.hl{position:fixed;border:3px solid #ffd23f;border-radius:14px;pointer-events:none;transition:left .45s var(--spring),top .45s var(--spring),width .45s,height .45s;animation:hlBoxIn .6s var(--spring) both,hlPulse 1.6s ease-in-out .6s infinite}
+.hl-num{position:absolute;top:-15px;left:-15px;width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#fff3b0,#ffd23f 60%,#c8801a);color:#000;border:2px solid #000;font-weight:900;font-size:1rem;display:grid;place-items:center;box-shadow:0 0 0 2px #fff,0 6px 0 #6e4a0a,0 10px 16px rgba(0,0,0,.5);animation:badgePop .6s .25s var(--spring) both}
+.hl-txt{position:fixed;border-radius:16px;overflow:hidden;background:#0a0e1a;color:#fff;border:2px solid #ffd23f;font-size:.98rem;line-height:1.5;font-weight:600;box-shadow:0 14px 34px rgba(0,0,0,.7),0 0 0 1px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12);pointer-events:none;transform-origin:top left;animation:hlTipIn .55s .15s var(--spring) both}
+.hl-step{padding:10px 14px 0;font-size:.7rem;letter-spacing:1.6px;text-transform:uppercase;color:#34e7e4;font-weight:800}
+.hl-body{padding:4px 14px 14px}
+.hl-bar{position:absolute;left:0;bottom:0;height:3px;width:100%;background:linear-gradient(90deg,#34e7e4,#ffd23f);transform-origin:left;animation:hlBar linear forwards}
+
+.leave .hl,.leave .hl-txt{animation:hlOut .38s ease-in forwards}
+
+.help-ctrl{position:fixed;left:max(16px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));z-index:4600;display:flex;align-items:center;gap:8px;opacity:0;transform:translateY(24px) scale(.9);pointer-events:none;transition:opacity .3s,transform .5s var(--spring)}
+.help-ctrl.show{opacity:1;transform:none;pointer-events:auto}
+.hc{border:1px solid rgba(52,231,228,.55);border-radius:14px;padding:11px 16px;font-size:.8rem;font-weight:800;letter-spacing:.4px;color:#eafffe;cursor:pointer;background:radial-gradient(circle at 30% 25%,rgba(52,231,228,.7),rgba(45,212,167,.25));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 5px 0 #0a5a4f,0 12px 20px rgba(0,0,0,.45);transition:transform .15s var(--spring),box-shadow .15s}
+.hc:active{transform:translateY(4px);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 1px 0 #0a5a4f,0 3px 6px rgba(0,0,0,.4)}
+.hc-ghost{color:var(--text);border-color:rgba(255,255,255,.25);background:var(--glass);box-shadow:0 5px 0 rgba(0,0,0,.3),0 12px 20px rgba(0,0,0,.4)}
+.hc-count{font-size:.7rem;color:#c9d3e6;font-weight:700;min-width:36px;text-align:center;text-shadow:0 1px 4px #000}
+.hc-go{width:100%;margin-top:14px;padding:13px}
+
+@keyframes hfIn{from{opacity:0;transform:translate(-50%,-50%) perspective(900px) rotateX(35deg) translateY(60px) scale(.85)}to{opacity:1;transform:translate(-50%,-50%) perspective(900px) rotateX(0) translateY(0) scale(1)}}
+@keyframes hfChild{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes hfShim{from{background-position:220% 0}to{background-position:-220% 0}}
+.hf-card{position:fixed;left:50%;top:50%;width:min(88vw,360px);padding:20px 18px 18px;border-radius:22px;color:#f0f4ff;background:linear-gradient(160deg,rgba(30,40,66,.97),rgba(8,12,24,.97));border:2px solid #ffd23f;box-shadow:0 0 0 4px #000,0 0 0 8px rgba(255,210,63,.3),0 30px 60px rgba(0,0,0,.65);animation:hfIn .75s var(--spring) both}
+.hf-card>*:not(.hf-img){animation:hfChild .5s var(--spring) backwards}
+.hf-card>*:nth-child(2){animation-delay:.08s}
+.hf-card>*:nth-child(3){animation-delay:.16s}
+.hf-card>*:nth-child(5){animation-delay:.3s}
+.hf-kicker{font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:#34e7e4;font-weight:800}
+.hf-title{font-size:1.2rem;margin:6px 0;font-weight:800}
+.hf-text{font-size:.85rem;line-height:1.5;color:#c9d3e6;margin-bottom:14px}
+.hf-card>.hf-img{width:100%;aspect-ratio:16/9;border-radius:14px;border:2px dashed rgba(255,210,63,.7);display:grid;place-items:center;font-size:.75rem;color:#c9d3e6;background:linear-gradient(110deg,rgba(255,255,255,.03) 30%,rgba(255,210,63,.2) 50%,rgba(255,255,255,.03) 70%);background-size:220% 100%;animation:hfShim 2.6s linear infinite}
+.hf-card>.hf-img{position:relative;overflow:hidden}
+.hf-card>.hf-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
 </style>
 </head>
 <body data-theme="dark">
@@ -245,7 +282,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opa
 <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
 <div class="toasts" id="toasts"></div>
 <div class="container">
-<header><h1><img class="logo" src="assets/hpc-logo.png" alt="HPC"> HPC Job Scanner</h1><div class="theme" id="theme" role="button" aria-label="Toggle theme">🌙</div></header>
+<header><h1><img class="logo" src="assets/hpc-logo.png" alt="HPC"> HPC Job Scanner</h1><div class="hdr-tools"><button class="help-fab" id="helpBtn" aria-label="Help" aria-expanded="false">?</button><div class="theme" id="theme" role="button" aria-label="Toggle theme">🌙</div></div></header>
 
 <label class="lbl" for="ta">Paste registrations, one per line. Add " - DONE" to mark completed.</label>
 <div class="iw"><textarea id="ta" class="ta" placeholder="BP24FCN&#10;PJ22VHO&#10;BL24RM - DONE"></textarea><button class="paste-btn" id="pasteBtn" aria-label="Paste from clipboard">📋 PASTE</button></div>
@@ -794,60 +831,110 @@ window.addEventListener('load',()=>{
 })();
 </script>
 
-<button class="help-fab" id="helpBtn" aria-label="Help" aria-expanded="false">?</button>
-<div id="helpOverlay" aria-hidden="true"></div>
+<div id="helpOverlay" aria-live="polite"></div>
+<div class="help-ctrl" id="helpCtrl">
+  <button class="hc hc-ghost" id="helpSkip">Skip</button>
+  <span class="hc-count" id="helpCount"></span>
+  <button class="hc" id="helpNext">Next ›</button>
+</div>
 <script>
-/* help tips: highlights the four numbered controls with a number badge and tip text */
+/* guided help tour: each control is highlighted in turn, auto-advancing after 3 to 10 seconds depending on text length */
 (function(){
-  const TIPS=[
-    {sel:'#ta',      text:'Paste or type here, or screenshot of the registrations email by [Import] button one registration per line. Add " - DONE" to mark a job completed.'},
-    {sel:'#addBtn',  text:'ADD: moves the registrations in the box into Pending (or Completed if marked DONE).'},
-    {sel:'#fab',     text:'Camera: opens the live scanner. Aim at a plate and it is matched against your list.'},
-    {sel:'#moreBtn', text:'MORE: export your lists, save or restore a backup, or reset all data.'}
+  const STEPS=[
+    {sel:'#ta',text:'Paste or type here, or screenshot of the registrations email by pressing the [Import] button, one registration per line. Add " - DONE" to mark completed.',inside:true},
+    {sel:'#addBtn',text:'ADD: moves the registrations in the box into Pending (or Completed if marked DONE).'},
+    {sel:'#fab',text:'Camera: opens the live scanner. Aim at a plate and it is matched against your list.'},
+    {sel:'#moreBtn',text:'MORE: export your lists, save or restore a backup, or reset all data.'}
   ];
-  const btn=document.getElementById('helpBtn'), ov=document.getElementById('helpOverlay');
-  let open=false;
+  const PAD=6;
+  const btn=document.getElementById('helpBtn'),ov=document.getElementById('helpOverlay'),
+        ctrl=document.getElementById('helpCtrl'),nextBtn=document.getElementById('helpNext'),
+        skipBtn=document.getElementById('helpSkip'),cnt=document.getElementById('helpCount');
+  let open=false,idx=0,timer=null,leaveT=null,closeT=null,busy=false,cur=null;
+  const dur=t=>Math.min(10000,Math.max(3000,1800+t.length*45));
 
-  function layout(){
-    ov.innerHTML='';
-    const W=innerWidth,H=innerHeight,pad=6;
-    TIPS.forEach((t,i)=>{
-      const el=document.querySelector(t.sel);
-      if(!el)return;
-      const r=el.getBoundingClientRect();
-
-      const box=document.createElement('div');
-      box.className='hl';
-      box.style.cssText=`left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px`;
-      const num=document.createElement('div');
-      num.className='hl-num';
-      num.textContent=i+1;
-      box.appendChild(num);
-      ov.appendChild(box);
-
-      const tip=document.createElement('div');
-      tip.className='hl-txt';
-      tip.textContent=`${i+1}. ${t.text}`;
-      const w=Math.min(230,W-24);
-      tip.style.width=w+'px';
-      ov.appendChild(tip);
-      const h=tip.offsetHeight;
-
-      let left=Math.min(Math.max(12,r.left),W-w-12);
-      let top=r.bottom+pad+14;
-      if(top+h>H-12) top=r.top-pad-14-h;   /* not enough room below: place above */
-      if(top<12) top=12;
-      tip.style.left=left+'px';
-      tip.style.top=top+'px';
-    });
+  function position(s,box,tip){
+    const el=document.querySelector(s.sel);if(!el)return;
+    const r=el.getBoundingClientRect(),W=innerWidth,H=innerHeight;
+    box.style.left=(r.left-PAD)+'px';box.style.top=(r.top-PAD)+'px';
+    box.style.width=(r.width+PAD*2)+'px';box.style.height=(r.height+PAD*2)+'px';
+    const w=s.inside?Math.max(160,r.width-150):Math.min(250,W-24);   /* leave room for PASTE button */
+    tip.style.width=w+'px';
+    const h=tip.offsetHeight;
+    let left,top;
+    if(s.inside){left=r.left+12;top=r.top+12}
+    else{
+      left=Math.min(Math.max(12,r.left),W-w-12);
+      top=r.bottom+PAD+14;
+      if(top+h>H-100)top=r.top-PAD-14-h;   /* not enough room below: place above, clear of the bottom controls */
+      if(top<12)top=12;
+    }
+    tip.style.left=left+'px';tip.style.top=top+'px';
   }
-  function show(){open=true;layout();ov.classList.add('show');btn.classList.add('on');btn.setAttribute('aria-expanded','true')}
-  function hide(){open=false;ov.classList.remove('show');ov.innerHTML='';btn.classList.remove('on');btn.setAttribute('aria-expanded','false')}
 
-  btn.addEventListener('click',e=>{e.stopPropagation();open?hide():show()});
-  ov.addEventListener('click',hide);             /* tap anywhere on the overlay to close it */
-  addEventListener('resize',()=>{if(open)layout()});
-  addEventListener('scroll',()=>{if(open)layout()},{passive:true});
+  function showStep(i){
+    if(i>=STEPS.length)return showFinal();
+    const s=STEPS[i];
+    if(!document.querySelector(s.sel))return showStep(i+1);
+    idx=i;ov.innerHTML='';
+    const box=document.createElement('div');box.className='hl';
+    const num=document.createElement('div');num.className='hl-num';num.textContent=i+1;
+    box.appendChild(num);
+    const tip=document.createElement('div');tip.className='hl-txt';
+    tip.innerHTML=`<div class="hl-step">Step ${i+1} of ${STEPS.length}</div><div class="hl-body"></div><div class="hl-bar"></div>`;
+    tip.querySelector('.hl-body').textContent=s.text;
+    const ms=dur(s.text);
+    tip.querySelector('.hl-bar').style.animationDuration=ms+'ms';
+    ov.append(box,tip);
+    cur={s,box,tip};
+    position(s,box,tip);
+    cnt.textContent=`${i+1} / ${STEPS.length}`;
+    nextBtn.textContent=i===STEPS.length-1?'Finish ›':'Next ›';
+    ctrl.classList.add('show');
+    timer=setTimeout(advance,ms);
+  }
+
+  function showFinal(){
+    clearTimeout(timer);cur=null;ov.innerHTML='';
+    ctrl.classList.remove('show');cnt.textContent='';
+    const c=document.createElement('div');c.className='hf-card';
+    c.innerHTML=`<div class="hf-kicker">You're all set</div>
+      <h3 class="hf-title">[Vehicle Reg Scanner]</h3>
+      <p class="hf-text">[Any feedback or issues please contact S.Ali to improve or redesign shahida@hydeparkcorner.net.]</p>
+      <div class="hf-img"><img src="assets/hpc-logo.png" alt="HPC logo"></div>
+      <button class="hc hc-go" id="hfGot">Got it</button>`;
+    ov.appendChild(c);
+    document.getElementById('hfGot').onclick=close;
+  }
+
+  function leaveAll(cb){
+    ov.classList.add('leave');
+    leaveT=setTimeout(()=>{ov.classList.remove('leave');ov.innerHTML='';cb()},380);
+  }
+  function advance(){
+    if(busy||!open)return;
+    busy=true;clearTimeout(timer);
+    leaveAll(()=>{busy=false;showStep(idx+1)});
+  }
+  function openHelp(){
+    clearTimeout(closeT);clearTimeout(leaveT);clearTimeout(timer);
+    open=true;busy=false;ov.classList.remove('leave');ov.innerHTML='';
+    ov.classList.add('show');btn.classList.add('on');btn.setAttribute('aria-expanded','true');
+    showStep(0);
+  }
+  function close(){
+    if(!open)return;
+    open=false;busy=false;clearTimeout(timer);clearTimeout(leaveT);
+    ov.classList.remove('show','leave');ctrl.classList.remove('show');
+    btn.classList.remove('on');btn.setAttribute('aria-expanded','false');
+    closeT=setTimeout(()=>{if(!open)ov.innerHTML=''},400);
+  }
+
+  btn.addEventListener('click',e=>{e.stopPropagation();open?close():openHelp()});
+  nextBtn.addEventListener('click',()=>{if(open)advance()});
+  skipBtn.addEventListener('click',close);
+  addEventListener('resize',()=>{if(open&&cur)position(cur.s,cur.box,cur.tip)});
+  addEventListener('scroll',()=>{if(open&&cur)position(cur.s,cur.box,cur.tip)},{passive:true});
 })();
 </script>
 </body>
